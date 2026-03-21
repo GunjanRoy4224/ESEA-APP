@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "572486052694",
+    "project_id": "esea-app",
+    "storage_bucket": "esea-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:572486052694:android:bf3cc5dff9880234ea44f7",
+        "android_client_info": {
+          "package_name": "com.esea.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCzPuZl_bRsNj6T3hcfbdY5cwifRIghPPc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
