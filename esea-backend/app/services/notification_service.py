@@ -1,20 +1,22 @@
 import firebase_admin
 from firebase_admin import credentials, messaging
 import os
+import json
 
 # Initialize Firebase only once
 if not firebase_admin._apps:
-    cred = credentials.Certificate(
-        os.getenv("FIREBASE_CREDENTIALS_PATH", "firebase_service_account.json")
-    )
+    firebase_json = os.getenv("FIREBASE_CREDENTIALS")
+
+    if not firebase_json:
+        raise Exception("FIREBASE_CREDENTIALS not set")
+
+    cred_dict = json.loads(firebase_json)
+
+    cred = credentials.Certificate(cred_dict)
     firebase_admin.initialize_app(cred)
 
 
 def send_topic_notification(title: str, body: str, topic: str, data: dict | None = None):
-    """
-    Send push notification to a Firebase topic
-    """
-
     message = messaging.Message(
         notification=messaging.Notification(
             title=title,
@@ -24,8 +26,4 @@ def send_topic_notification(title: str, body: str, topic: str, data: dict | None
         topic=topic,
     )
 
-    try:
-        return messaging.send(message)
-    except Exception as e:
-        print("❌ Notification error:", str(e))
-        return None
+    return messaging.send(message)
