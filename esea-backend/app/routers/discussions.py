@@ -140,38 +140,53 @@ def get_discussions(
 
     discussions = query.offset(offset).limit(limit).all()
 
-    # PERFORMANCE FIX (no logic change)
+    # PERFORMANCE OPTIMIZATION
     discussion_ids = [d.id for d in discussions]
 
-    votes = db.query(DiscussionVote).filter(
-        DiscussionVote.user_id == current_user.id,
-        DiscussionVote.discussion_id.in_(discussion_ids)
-    ).all()
+    vote_map = {}
+    if discussion_ids:
+        votes = db.query(DiscussionVote).filter(
+            DiscussionVote.user_id == current_user.id,
+            DiscussionVote.discussion_id.in_(discussion_ids)
+        ).all()
+        vote_map = {v.discussion_id: True for v in votes}
 
-    vote_map = {v.discussion_id: True for v in votes}
-
-    poll_votes = db.query(DiscussionPollVote).filter(
-        DiscussionPollVote.user_id == current_user.id,
-        DiscussionPollVote.discussion_id.in_(discussion_ids)
-    ).all()
-
-    poll_map = {v.discussion_id: v.option_indexes for v in poll_votes}
+    poll_map = {}
+    if discussion_ids:
+        poll_votes = db.query(DiscussionPollVote).filter(
+            DiscussionPollVote.user_id == current_user.id,
+            DiscussionPollVote.discussion_id.in_(discussion_ids)
+        ).all()
+        poll_map = {v.discussion_id: v.option_indexes for v in poll_votes}
 
     result = []
 
     for d in discussions:
 
         voted = vote_map.get(d.id, False)
-
         poll_data = d.poll_data
         user_poll_vote = poll_map.get(d.id)
 
-        # FIX: Hide poll result until user votes
+        # 🔥 FIXED SAFE POLL HANDLING
         if poll_data and not user_poll_vote:
-            hidden_poll = copy.deepcopy(poll_data)
-            for opt in hidden_poll["options"]:
-                opt["votes"] = 0
-            poll_data = hidden_poll
+            try:
+                hidden_poll = copy.deepcopy(poll_data)
+
+                # CASE 1: dict format (expected)
+                if isinstance(hidden_poll, dict):
+                    options = hidden_poll.get("options", [])
+                else:
+                    # CASE 2: list format (fallback)
+                    options = hidden_poll
+
+                for opt in options:
+                    if isinstance(opt, dict):
+                        opt["votes"] = 0
+
+                poll_data = hidden_poll
+
+            except Exception as e:
+                print("Poll parsing error:", e)
 
         result.append({
             "id": d.id,

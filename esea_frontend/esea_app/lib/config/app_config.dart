@@ -1,11 +1,11 @@
 /// Application configuration and constants
 class AppConfig {
   // API Configuration
-  static const String baseUrl = 'https://betsy-parchable-nonextricably.ngrok-free.dev/api'; // For Android emulator
+  static const String baseUrl = 'https://esea-app.onrender.com/api';
   // static const String baseUrl = 'http://localhost:8000/api'; // For iOS simulator
   // static const String baseUrl = 'https://api.esea.org/api'; // For production
   
-  static const String uploadsUrl = 'https://betsy-parchable-nonextricably.ngrok-free.dev/uploads';
+  static const String uploadsUrl = 'https://esea-app.onrender.com/uploads';
   
   // App Info
   static const String appName = 'ESEA App';

@@ -39,18 +39,18 @@ class AuthService {
 
       return user;
     } on DioException catch (e) {
-      print("❌ FETCH USER ERROR: ${e.response?.data}");
+      print(" FETCH USER ERROR: ${e.response?.data}");
 
-      // ✅ If token invalid → logout
+      //  If token invalid → logout
       if (e.response?.statusCode == 401) {
         await _storage.clearAll();
         return null;
       }
 
-      // ✅ fallback to cached user
+      //  fallback to cached user
       return await _storage.getUser();
     } catch (e) {
-      print("❌ UNKNOWN ERROR: $e");
+      print(" UNKNOWN ERROR: $e");
       return await _storage.getUser();
     }
   }
@@ -60,15 +60,15 @@ class AuthService {
   /// ================================
   Future<User?> loginWithToken(String token) async {
     try {
-      // ✅ Save token first
+      //  Save token first
       await _storage.saveToken(token);
 
-      // ✅ Immediately fetch user
+      //  Immediately fetch user
       final user = await fetchCurrentUser();
 
       return user;
     } catch (e) {
-      print("❌ LOGIN TOKEN ERROR: $e");
+      print(" LOGIN TOKEN ERROR: $e");
       return null;
     }
   }

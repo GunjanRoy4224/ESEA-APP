@@ -1,10 +1,10 @@
 class ApiConstants {
-  // static const String baseUrl = "http://10.0.2.2:8000/api";
+  
 
   // Auth
   static const String ssoLogin = "/auth/sso/login";
   static const String me = "/users/me";
-
+  
   // Content
   static String contentByType(String type) => "/content/$type";
 

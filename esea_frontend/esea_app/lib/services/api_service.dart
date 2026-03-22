@@ -4,7 +4,7 @@ import '../models/content_model.dart';
 class ApiService {
   final Dio _dio = Dio(
     BaseOptions(
-      baseUrl: "https://betsy-parchable-nonextricably.ngrok-free.dev/api",
+      baseUrl: "https://esea-app.onrender.com/api",
       connectTimeout: const Duration(seconds: 15),
       receiveTimeout: const Duration(seconds: 15),
     ),
