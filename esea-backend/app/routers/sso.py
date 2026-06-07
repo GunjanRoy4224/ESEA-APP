@@ -42,12 +42,22 @@ def get_or_create_user_from_sso(profile: dict, db: Session) -> User:
     Creates or fetches a student user from IITB SSO profile
     """
 
-    # 🔑 REQUIRED FIELD
-    sso_id = str(profile["id"])
+    # 🔑 REQUIRED FIELD (Gymkhana SSO typically uses username or roll_number, 'id' may not exist)
+    sso_id_raw = profile.get("username") or profile.get("roll_number") or profile.get("id")
+    if not sso_id_raw:
+        raise HTTPException(400, "Could not identify user from SSO profile")
+    sso_id = str(sso_id_raw)
 
-    # 1️⃣ Existing user check
-    user = db.query(User).filter(User.sso_id == sso_id).first()
+    # 1️⃣ Existing user check (Check sso_id or username to avoid IntegrityError)
+    user = db.query(User).filter(
+        (User.sso_id == sso_id) | 
+        (User.username == profile.get("username"))
+    ).first()
+    
     if user:
+        if not user.sso_id:
+            user.sso_id = sso_id
+            db.commit()
         return user
 
     # 2️⃣ Program block (SAFE)
