@@ -1,4 +1,5 @@
 import base64
+import profile
 import requests
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
@@ -43,7 +44,7 @@ def get_or_create_user_from_sso(profile: dict, db: Session) -> User:
     """
 
     # 🔑 REQUIRED FIELD (Gymkhana SSO typically uses username or roll_number, 'id' may not exist)
-    sso_id_raw = profile.get("username") or profile.get("roll_number") or profile.get("id")
+    sso_id_raw = profile.get("id")
     if not sso_id_raw:
         raise HTTPException(400, "Could not identify user from SSO profile")
     sso_id = str(sso_id_raw)
@@ -147,6 +148,10 @@ def sso_callback(code: str, db: Session = Depends(get_db)):
         raise HTTPException(400, "Failed to fetch user profile")
 
     profile = profile_response.json()
+    print("========== SSO PROFILE ==========")
+    print(profile)
+    print("=================================")
+
 
     # 3️⃣ CREATE / FETCH USER
     user = get_or_create_user_from_sso(profile, db)
