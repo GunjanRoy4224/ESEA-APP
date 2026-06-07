@@ -84,6 +84,7 @@ class AuthService {
   /// LOGOUT
   /// ================================
   Future<void> logout() async {
+    DioClient().clearToken();
     await _storage.clearAll();
   }
 }

@@ -38,7 +38,7 @@ export default function AuditLogs() {
         <tbody>
           {logs.map((log) => (
             <tr key={log.id}>
-              <td>{new Date(log.timestamp + "Z").toLocaleString("en-IN", {
+              <td>{new Date(log.timestamp.endsWith('Z') ? log.timestamp : log.timestamp + 'Z').toLocaleString("en-IN", {
                     timeZone: "Asia/Kolkata",
                     hour12: true,
                   })}

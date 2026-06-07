@@ -297,6 +297,12 @@ class _HomeScreenState extends State<HomeScreen> {
           FutureBuilder<List<ContentModel>>(
             future: announcementsFuture,
             builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              if (snapshot.hasError) {
+                return const Text("Error loading announcements");
+              }
               if (!snapshot.hasData || snapshot.data!.isEmpty) {
                 return const Text(
                   "No announcements yet",

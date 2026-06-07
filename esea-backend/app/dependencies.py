@@ -37,8 +37,30 @@ def get_current_user(
 
     return user   
 
-
 # ----------------------------
+# Optional user auth
+# ----------------------------
+from fastapi import Request
+def get_current_user_optional(
+    request: Request,
+    db: Session = Depends(get_db),
+):
+    token = request.headers.get("Authorization")
+    if not token or not token.startswith("Bearer "):
+        return None
+    token = token.split("Bearer ")[1]
+    try:
+        payload = jwt.decode(
+            token,
+            settings.SECRET_KEY,
+            algorithms=[settings.ALGORITHM],
+        )
+        user_id = payload.get("sub")
+        if user_id is None:
+            return None
+        return db.query(User).filter(User.id == int(user_id)).first()
+    except JWTError:
+        return None# ----------------------------
 # Student-only auth
 # ----------------------------
 def get_current_student(

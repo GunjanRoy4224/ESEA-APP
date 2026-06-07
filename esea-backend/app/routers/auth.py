@@ -3,6 +3,7 @@ from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from jose import jwt, JWTError
 from passlib.context import CryptContext
+from datetime import datetime, timedelta
 
 from app.database import get_db
 from app.models.user import User
@@ -18,11 +19,14 @@ oauth2_scheme = OAuth2PasswordBearer(
 )
 
 # -------------------------------------------------
-# JWT UTIL (NO EXPIRY AS REQUESTED)
+# JWT UTIL
 # -------------------------------------------------
 def create_access_token(data: dict):
+    to_encode = data.copy()
+    expire = datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    to_encode.update({"exp": expire})
     return jwt.encode(
-        data,
+        to_encode,
         settings.SECRET_KEY,
         algorithm=settings.ALGORITHM,
     )

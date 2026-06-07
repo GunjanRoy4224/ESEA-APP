@@ -31,7 +31,8 @@ function App() {
           {/*Redirect root*/}
           <Route path="/" element={<Navigate to="/login" replace />} />
           {/* Protected Admin Layout */}
-          <Route element={<AdminLayout />}>
+          <Route element={<RequireAdmin />}>
+            <Route element={<AdminLayout />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/content" element={<ContentList />} />
             <Route path="/content/create" element={<CreateContent />} />
@@ -49,6 +50,7 @@ function App() {
             <Route path="/course-info/edit/:id" element={<EditCourseInfo />} />
             <Route path="/esea-id/upload" element = {<UploadEseaIdCsv />} />
             <Route path="/audit" element={<AuditLogs />} />
+          </Route>
           </Route>
 
           {/* Fallback */}

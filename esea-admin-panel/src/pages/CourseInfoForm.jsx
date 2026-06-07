@@ -34,6 +34,14 @@ export default function CourseInfoForm({ initial, onSubmit }) {
     });
   };
 
+  const removeItem = (key, idx) => {
+    const list = form.info[key].filter((_, i) => i !== idx);
+    setForm({
+      ...form,
+      info: { ...form.info, [key]: list },
+    });
+  };
+
   return (
     <div>
       <input
@@ -79,6 +87,7 @@ export default function CourseInfoForm({ initial, onSubmit }) {
                   updateItem(key, idx, "link", e.target.value)
                 }
               />
+              <button onClick={() => removeItem(key, idx)} style={{ marginLeft: "10px", color: "red" }}>Remove</button>
             </div>
           ))}
           <button onClick={() => addItem(key)}>Add {key}</button>

@@ -30,27 +30,21 @@ def upload_esea_id_csv(
     if not reader.fieldnames or not required_cols.issubset(reader.fieldnames):
         raise HTTPException(400, "Invalid CSV format")
 
-    updated = 0
-    skipped = 0
-
+    roll_to_esea = {}
     for row in reader:
         roll = row.get("roll_number")
         esea_id = row.get("esea_id")
+        if roll and esea_id:
+            roll_to_esea[roll] = str(esea_id)
 
-        if not roll or not esea_id:
-            skipped += 1
-            continue
+    users = db.query(User).filter(User.roll_number.in_(roll_to_esea.keys())).all()
 
-        user = db.query(User).filter(
-            User.roll_number == roll
-        ).first()
+    updated = 0
+    # Those not found in DB are skipped
+    skipped = len(roll_to_esea) - len(users)
 
-        if not user:
-            skipped += 1
-            continue
-
-        # ✅ FIX: safe assignment
-        user.esea_id = str(esea_id)
+    for user in users:
+        user.esea_id = roll_to_esea[user.roll_number]
         updated += 1
 
     db.commit()

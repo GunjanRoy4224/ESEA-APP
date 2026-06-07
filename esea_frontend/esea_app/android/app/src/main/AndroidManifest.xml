@@ -4,7 +4,7 @@
     <!-- ✅ PERMISSIONS (CORRECT PLACE) -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
-    <uses-permission android:name="android.permission.CAMERA"/> <!-- ✅ MOVED HERE -->
+    <uses-permission android:name="android.permission.CAMERA"/> <!--  MOVED HERE -->
 
     <application
         android:label="esea_app"

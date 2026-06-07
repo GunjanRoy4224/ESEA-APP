@@ -9,8 +9,13 @@ export default function CourseInfoList() {
   const [items, setItems] = useState([]);
 
   const load = async () => {
-    const res = await fetchCourseInfo();
-    setItems(res.data);
+    try {
+      const res = await fetchCourseInfo();
+      setItems(res.data);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to load course info");
+    }
   };
 
   useEffect(() => {
@@ -19,8 +24,13 @@ export default function CourseInfoList() {
 
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this course info?")) return;
-    await deleteCourseInfo(id);
-    load();
+    try {
+      await deleteCourseInfo(id);
+      load();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to delete course info");
+    }
   };
 
   return (

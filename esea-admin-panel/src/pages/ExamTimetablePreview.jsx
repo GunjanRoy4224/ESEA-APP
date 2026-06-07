@@ -10,11 +10,11 @@ export default function ExamTimetablePreview() {
       .catch(() => setData(null));
   }, []);
 
-  if (!data || data.message) {
+  if (!data || data.message || !data.rows || data.rows.length === 0) {
     return (
       <div style={{ padding: 40 }}>
         <h3>Exam Timetable</h3>
-        <p>Not announced yet</p>
+        <p>Not announced yet or empty</p>
       </div>
     );
   }

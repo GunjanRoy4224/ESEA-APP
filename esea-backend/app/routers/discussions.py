@@ -124,17 +124,19 @@ def get_discussions(
     current_user: User = Depends(get_current_user),
 ):
 
+    from sqlalchemy.orm import joinedload
     offset = (page - 1) * limit
 
     if sort == "top":
         seven_days_ago = datetime.utcnow() - timedelta(days=7)
         query = (
             db.query(Discussion)
+            .options(joinedload(Discussion.author))
             .filter(Discussion.created_at >= seven_days_ago)
             .order_by(Discussion.upvotes_count.desc())
         )
     else:
-        query = db.query(Discussion).order_by(
+        query = db.query(Discussion).options(joinedload(Discussion.author)).order_by(
             Discussion.created_at.desc()
         )
 
@@ -182,6 +184,7 @@ def get_discussions(
                 for opt in options:
                     if isinstance(opt, dict):
                         opt["votes"] = 0
+                        opt.pop("is_correct", None)
 
                 poll_data = hidden_poll
 

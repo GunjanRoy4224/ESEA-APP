@@ -16,11 +16,15 @@ export default function CreateContent() {
     deadline: "",
   });
 
+  const [loading, setLoading] = useState(false);
+
   const handleSubmit = async () => {
     if (!form.type || !form.title.trim() || !form.short_description.trim()) {
       alert("Type, Title and Short Description are required");
       return;
     }
+
+    setLoading(true);
 
     // ✅ Build payload exactly as backend expects
     const payload = {
@@ -36,10 +40,7 @@ export default function CreateContent() {
       event_date: form.event_date || null,
       event_time: form.event_time || null,
 
-      // ⚠️ backend expects DATE, not datetime
-      deadline: form.deadline
-        ? form.deadline.split("T")[0]
-        : null,
+      deadline: form.deadline || null,
     };
 
     try {
@@ -63,6 +64,8 @@ export default function CreateContent() {
     } catch (err) {
       console.error(err);
       alert("Error creating content");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -148,7 +151,7 @@ export default function CreateContent() {
 
       <h5>Deadline</h5>
       <input
-        type="datetime-local"
+        type="date"
         value={form.deadline}
         onChange={(e) =>
           setForm({ ...form, deadline: e.target.value })
@@ -187,7 +190,9 @@ export default function CreateContent() {
 
       <br /><br />
 
-      <button onClick={handleSubmit}>Publish</button>
+      <button onClick={handleSubmit} disabled={loading}>
+        {loading ? "Publishing..." : "Publish"}
+      </button>
     </div>
   );
 }

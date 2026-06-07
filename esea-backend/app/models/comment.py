@@ -14,7 +14,7 @@ class Comment(Base):
 
     content = Column(Text, nullable=False)
 
-    parent_comment_id = Column(Integer, nullable=True)
+    parent_comment_id = Column(Integer, ForeignKey("comments.id", ondelete="CASCADE"), nullable=True)
 
     upvotes_count = Column(Integer, default=0)
 

@@ -6,8 +6,13 @@ export default function CreateCourseInfo() {
   const navigate = useNavigate();
 
   const submit = async (data) => {
-    await createCourseInfo(data);
-    navigate("/course-info");
+    try {
+      await createCourseInfo(data);
+      navigate("/course-info");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to create course info");
+    }
   };
 
   return (

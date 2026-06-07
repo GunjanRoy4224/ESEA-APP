@@ -13,13 +13,16 @@ def process_notifications(db):
     )
 
     for task in tasks:
-
-        send_topic_notification(
-            title="ESEA Update",
-            body=task.title,
-            topic=task.topic
-        )
-
-        task.sent = True
+        try:
+            send_topic_notification(
+                title="ESEA Update",
+                body=task.title,
+                topic=task.topic
+            )
+        except Exception as e:
+            print(f"Failed to send notification task {task.id}: {e}")
+        finally:
+            # Mark as sent so it doesn't block the queue forever
+            task.sent = True
 
     db.commit()

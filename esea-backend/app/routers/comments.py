@@ -14,13 +14,20 @@ router = APIRouter(
 )
 
 
+from pydantic import BaseModel
+from typing import Optional
+
+class CommentCreate(BaseModel):
+    content: str
+    parent_id: Optional[int] = None
+
 # ===============================
 # Add Comment
 # ===============================
 @router.post("/{discussion_id}")
 def add_comment(
     discussion_id: int,
-    data: dict,
+    data: CommentCreate,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
@@ -32,11 +39,11 @@ def add_comment(
         raise HTTPException(404, "Discussion not found")
 
     # CONTENT VALIDATION
-    content = (data.get("content") or "").strip()
+    content = data.content.strip()
     if not content:
         raise HTTPException(400, "Content required")
 
-    parent_id = data.get("parent_id")
+    parent_id = data.parent_id
 
     # VALIDATE PARENT COMMENT
     if parent_id:
@@ -140,10 +147,13 @@ def delete_comment(
         Discussion.id == comment.discussion_id
     ).first()
 
-    if discussion and discussion.comments_count > 0:
-        discussion.comments_count -= 1
-
     db.delete(comment)
     db.commit()
+
+    if discussion:
+        discussion.comments_count = db.query(Comment).filter(
+            Comment.discussion_id == discussion.id
+        ).count()
+        db.commit()
 
     return {"deleted": True}

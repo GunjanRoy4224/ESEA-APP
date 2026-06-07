@@ -1,17 +1,9 @@
-from dotenv import load_dotenv
+from app.config import settings
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
-import os
-
-# ---------------- LOAD ENV ----------------
-load_dotenv()
-
-DATABASE_URL = os.getenv("DATABASE_URL")
-
-if not DATABASE_URL:
-    raise ValueError("DATABASE_URL is not set")
 
 # ---------------- ENGINE ----------------
+DATABASE_URL = settings.DATABASE_URL
 engine = create_engine(
     DATABASE_URL,
     pool_pre_ping=True,       # voids stale connections (important for Neon)

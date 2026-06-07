@@ -12,7 +12,8 @@ class Settings(BaseSettings):
     # Security
     SECRET_KEY: str
     ALGORITHM: str = "HS256"
- 
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 10080  # Default 7 days
+
 
     # IITB SSO
     SSO_ENABLED: bool = False

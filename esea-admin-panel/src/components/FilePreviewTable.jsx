@@ -35,13 +35,20 @@ export default function FilePreviewTable({ file, maxRows = 10 }) {
     const reader = new FileReader();
 
     reader.onload = (e) => {
-      const workbook = XLSX.read(e.target.result, { type: "binary" });
-      const sheet = workbook.Sheets[workbook.SheetNames[0]];
-      const json = XLSX.utils.sheet_to_json(sheet);
-      setRows(json.slice(0, maxRows));
+      setTimeout(() => {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: "array" });
+          const sheet = workbook.Sheets[workbook.SheetNames[0]];
+          const json = XLSX.utils.sheet_to_json(sheet);
+          setRows(json.slice(0, maxRows));
+        } catch (err) {
+          console.error(err);
+        }
+      }, 0);
     };
 
-    reader.readAsBinaryString(file);
+    reader.readAsArrayBuffer(file);
   }, [file, maxRows]);
 
   if (!file || rows.length === 0) return null;

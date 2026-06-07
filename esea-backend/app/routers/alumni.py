@@ -18,26 +18,10 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 # -----------------------------------------
 def verify_from_iitb_page(qr_url: str, input_name: str):
     try:
-        print("🌐 Opening IITB page:", qr_url)
-
-        # ✅ SECURITY FIX
-        if not qr_url.lower().startswith("https://iitb.ac.in/"):
-            print("Invalid domain")
-            return False
-
-        response = requests.get(qr_url, timeout=3)
-
-        if response.status_code != 200:
-            print("IITB page not reachable")
-            return False
-
-        page_text = response.text.lower()
-
-        name_clean = input_name.lower().replace(" ", "")
-        page_clean = page_text.replace(" ", "")
-
-        return name_clean in page_clean
-
+        # TODO: Implement secure internal lookup directory or signed certificate verification.
+        # String matching on an HTML page is vulnerable to SSRF and trivial bypass.
+        # Defaulting to manual verification for security.
+        return False
     except Exception as e:
         print("Verification error:", str(e))
         return False

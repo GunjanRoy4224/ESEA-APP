@@ -61,7 +61,11 @@ class AppEntry extends StatelessWidget {
     final auth = context.watch<AuthProvider>();
 
     if (auth.isLoading) {
-      return const LoginSSOScreen();
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
     }
 
     if (!auth.isAuthenticated) {

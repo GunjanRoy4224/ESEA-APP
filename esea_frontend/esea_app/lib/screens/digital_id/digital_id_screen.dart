@@ -69,7 +69,7 @@ class DigitalIdScreen extends StatelessWidget {
       Positioned(
         top: -40,
         left: -40,
-        child: Container(
+        child: SizedBox(
           width: 180,
           height: 180,
            
