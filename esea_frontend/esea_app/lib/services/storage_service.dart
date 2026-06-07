@@ -3,8 +3,11 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../models/user.dart';
 
 class StorageService {
-  final FlutterSecureStorage _storage =
-      const FlutterSecureStorage();
+  final FlutterSecureStorage _storage = const FlutterSecureStorage(
+    aOptions: AndroidOptions(
+      encryptedSharedPreferences: true,
+    ),
+  );
 
   static const _tokenKey = "jwt_token";
   static const _userKey = "user_profile";

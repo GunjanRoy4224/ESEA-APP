@@ -23,6 +23,8 @@ class DioClient {
     BaseOptions(
       baseUrl: AppConfig.baseUrl,
       followRedirects: false,
+      connectTimeout: const Duration(seconds: 15),
+      receiveTimeout: const Duration(seconds: 15),
     ),
   );
 

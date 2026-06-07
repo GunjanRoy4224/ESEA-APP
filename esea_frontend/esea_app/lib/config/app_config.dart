@@ -1,9 +1,9 @@
-/// Application configuration and constants
+import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart' show kIsWeb;
+
 class AppConfig {
   // API Configuration
   static const String baseUrl = 'https://esea-app.onrender.com/api';
-  // static const String baseUrl = 'http://localhost:8000/api'; // For iOS simulator
-  // static const String baseUrl = 'https://api.esea.org/api'; // For production
   
   static const String uploadsUrl = 'https://esea-app.onrender.com/uploads';
   

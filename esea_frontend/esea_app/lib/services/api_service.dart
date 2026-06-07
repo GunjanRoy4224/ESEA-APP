@@ -1,10 +1,11 @@
 import 'package:dio/dio.dart';
 import '../models/content_model.dart';
+import '../config/app_config.dart';
 
 class ApiService {
   final Dio _dio = Dio(
     BaseOptions(
-      baseUrl: "https://esea-app.onrender.com/api",
+      baseUrl: AppConfig.baseUrl,
       connectTimeout: const Duration(seconds: 15),
       receiveTimeout: const Duration(seconds: 15),
     ),

@@ -87,7 +87,13 @@ class AuthProvider with ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    final url = await _authService.getSSOLoginUrl();
+    String? url;
+    try {
+      url = await _authService.getSSOLoginUrl();
+    } catch (e) {
+      print("❌ SSO URL ERROR: $e");
+      url = null;
+    }
 
     _isLoading = false;
     notifyListeners();
