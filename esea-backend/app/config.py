@@ -24,6 +24,9 @@ class Settings(BaseSettings):
     SSO_PROFILE_URL: Optional[str] = None
     SSO_REDIRECT_URI: Optional[str] = None
 
+    # Firebase
+    FIREBASE_CREDENTIALS: Optional[str] = None
+
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"

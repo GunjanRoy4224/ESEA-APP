@@ -15,18 +15,22 @@ router = APIRouter(prefix="/auth", tags=["SSO"])
 # -------------------------------------------------
 # SSO LOGIN URL
 # -------------------------------------------------
+import urllib.parse
+
 @router.get("/sso/login")
 def sso_login():
     """
     Returns Gymkhana SSO authorization URL
     """
-    auth_url = (
-        f"{settings.SSO_AUTH_URL}"
-        f"?client_id={settings.SSO_CLIENT_ID}"
-        f"&response_type=code"
-        f"&scope=basic profile ldap program picture"
-        f"&redirect_uri={settings.SSO_REDIRECT_URI}"
-    )
+    params = {
+        "client_id": settings.SSO_CLIENT_ID,
+        "response_type": "code",
+        "scope": "basic profile ldap program picture",
+        "redirect_uri": settings.SSO_REDIRECT_URI
+    }
+    query_string = urllib.parse.urlencode(params)
+    auth_url = f"{settings.SSO_AUTH_URL}?{query_string}"
+    
     return {"url": auth_url}
 
 
