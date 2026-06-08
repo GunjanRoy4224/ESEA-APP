@@ -138,7 +138,7 @@ class EseaIdCard extends StatelessWidget {
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(8),
                               ),
-                              child: Image.asset('assets/images/logo.png', height: 28),
+                              child: Image.asset('assets/images/esea_logo.png', height: 28),
                             ),
                             const SizedBox(width: 12),
                             const Text(

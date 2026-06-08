@@ -19,9 +19,11 @@ class AppConfig {
   static const int defaultPageSize = 20;
   
   // Upload Limits
-  static const int maxFileSize = 10 * 1024 * 1024; // 10MB
+  static const int maxFileSize = 20 * 1024 * 1024; // 20MB
   
   // Supported file types
   static const List<String> supportedDocTypes = ['pdf', 'doc', 'docx', 'ppt', 'pptx'];
   static const List<String> supportedImageTypes = ['jpg', 'jpeg', 'png', 'gif'];
+  static const List<String> supportedVideoTypes = ['mp4', 'mov', 'avi', 'mkv', 'webm'];
+  static const List<String> supportedAudioTypes = ['mp3', 'wav', 'aac'];
 }

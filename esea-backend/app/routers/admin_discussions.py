@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.database import get_db
-from app.models.discussion import Discussion, Comment
+from app.models.discussion import Discussion
+from app.models.comment import Comment
 from app.models.user import User
 from app.dependencies import require_admin
 from app.services.audit_service import log_action
