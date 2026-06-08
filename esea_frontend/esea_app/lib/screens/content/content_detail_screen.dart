@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../models/content_model.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../common/pdf_viewer_screen.dart';
 
 class ContentDetailScreen extends StatelessWidget {
@@ -109,12 +110,14 @@ class ContentDetailScreen extends StatelessWidget {
               const SizedBox(height: 8),
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: Image.network(
-                  item.imageUrl!,
+                child: CachedNetworkImage(
+                  imageUrl: item.imageUrl!.startsWith('http')
+                      ? item.imageUrl!
+                      : "${AppConfig.uploadsUrl}${item.imageUrl}",
                   height: 200,
                   width: double.infinity,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) {
+                  errorWidget: (_, __, ___) {
                     return Container(
                       height: 200,
                       alignment: Alignment.center,

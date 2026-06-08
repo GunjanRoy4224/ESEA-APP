@@ -17,6 +17,7 @@ from app.services.audit_service import log_action
 
 from app.services.notification_task_service import create_content_notifications
 from app.services.notification_service import send_topic_notification
+from app.models.notification_task import NotificationTask
 
 
 router = APIRouter(prefix="/admin/content")
@@ -65,6 +66,15 @@ def get_content(
 
     return content
 
+
+@router.get("/internships/pending")
+def get_pending_internships(
+    db: Session = Depends(get_db),
+    admin=Depends(require_admin),
+):
+    from app.models.content import Content
+    pending = db.query(Content).filter(Content.type == "internship", Content.is_verified == False).order_by(Content.created_at.desc()).all()
+    return pending
 
 # ================= UPDATE CONTENT =================
 
@@ -151,11 +161,63 @@ def approve_internship(
 
     db.commit()
 
-    # 🔔 Send notification to ESEA members
+    # 🔔 Send notification to ESEA members immediately
     send_topic_notification(
         title="New Internship (ESEA Exclusive)",
         body=content.title,
-        topic="esea_members"
+        topic="esea_members",
+        data={
+            "type": "Internship",
+            "id": str(content.id)
+        }
     )
 
+    # 🔔 Schedule notification to all students when it goes public
+    public_task = NotificationTask(
+        content_id=content.id,
+        content_type="internship",
+        title=f"New Internship: {content.title}",
+        send_at=content.public_release_date,
+        topic="students"
+    )
+    db.add(public_task)
+    
+    log_action(
+        db=db,
+        user=admin,
+        action="Approved internship",
+        entity="content",
+        entity_id=content.id,
+    )
+    
+    db.commit()
+
     return {"message": "Internship approved"}
+
+# ================= REJECT INTERNSHIP =================
+
+@router.post("/{content_id}/reject")
+def reject_internship(
+    content_id: str,
+    db: Session = Depends(get_db),
+    admin=Depends(require_admin),
+):
+
+    content = get_content_by_id(db, content_id)
+
+    if not content or content.type != "internship":
+        raise HTTPException(404, "Internship not found")
+
+    # Log rejection before deleting
+    log_action(
+        db=db,
+        user=admin,
+        action="Rejected internship",
+        entity="content",
+        entity_id=content.id,
+    )
+
+    db.delete(content)
+    db.commit()
+
+    return {"message": "Internship rejected and deleted"}

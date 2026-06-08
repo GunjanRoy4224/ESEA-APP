@@ -24,6 +24,21 @@ from app.routers.discussions import router as discussions
 from app.routers.comments import router as comments
 from app.routers.internship_submit_router import router as internship_submit_router
 from app.routers.alumni import router as alumni
+from app.routers.admin_alumni import router as admin_alumni
+from app.routers.admin_discussions import router as admin_discussions
+from app.routers.upload import router as upload_router
+from app.routers.search import router as search_router
+
+import sentry_sdk
+from app.config import settings
+
+if settings.SENTRY_DSN:
+    sentry_sdk.init(
+        dsn=settings.SENTRY_DSN,
+        environment=settings.ENVIRONMENT,
+        traces_sample_rate=1.0,
+        profiles_sample_rate=1.0,
+    )
 
 app = FastAPI(title="ESEA API")
 
@@ -45,6 +60,7 @@ app.add_middleware(
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
 
 # ---------------- GLOBAL EXCEPTION HANDLER ----------------
@@ -82,6 +98,10 @@ app.include_router(discussions, prefix="/api")
 app.include_router(comments, prefix="/api")
 app.include_router(internship_submit_router, prefix="/api")
 app.include_router(alumni, prefix="/api")
+app.include_router(admin_alumni, prefix="/api")
+app.include_router(admin_discussions, prefix="/api")
+app.include_router(upload_router, prefix="/api")
+app.include_router(search_router, prefix="/api")
 
 # ---------------- STATIC FILES ----------------
-app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+# Local /uploads mount removed in favor of Supabase Storage

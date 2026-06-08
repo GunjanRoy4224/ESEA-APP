@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import '../../services/discussion_service.dart';
 import '../../models/discussion_model.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../config/app_config.dart';
 import 'discussion_comments_widget.dart';
 
@@ -173,8 +174,10 @@ class _DiscussionDetailScreenState
                             BorderRadius.circular(12),
                         child: AspectRatio(
                           aspectRatio: 16 / 9,
-                          child: Image.network(
-                            "${AppConfig.uploadsUrl}${d.imageUrl}",
+                          child: CachedNetworkImage(
+                            imageUrl: widget.discussion.imageUrl!.startsWith('http')
+                                ? widget.discussion.imageUrl!
+                                : "${AppConfig.uploadsUrl}${widget.discussion.imageUrl}",
                             fit: BoxFit.cover,
                           ),
                         ),

@@ -7,7 +7,7 @@ import '../screens/events/events_screen.dart';
 import '../screens/announcements/announcements_screen.dart';
 import '../screens/newsletter/newsletter_screen.dart';
 import '../screens/blogs/research_blog_screen.dart';
-
+import '../screens/timetable/timetable_screen.dart';
 
 class NotificationService {
   final FlutterLocalNotificationsPlugin _localNotifications =
@@ -24,7 +24,7 @@ class NotificationService {
   // -------------------------------
   // Initialize notifications
   // -------------------------------
-  Future<void> initNotifications({required bool isEseaMember}) async {
+  Future<void> initNotifications({required bool isEseaMember, required bool isStudent}) async {
 
     // Request notification permission
     NotificationSettings settings = await _messaging.requestPermission(
@@ -59,6 +59,12 @@ class NotificationService {
     if (isEseaMember) {
       await _messaging.subscribeToTopic("esea_members");
       print("Subscribed to topic: esea_members");
+    }
+
+    // Subscribe Students
+    if (isStudent) {
+      await _messaging.subscribeToTopic("students");
+      print("Subscribed to topic: students");
     }
 
     // Start listeners
@@ -162,6 +168,14 @@ class NotificationService {
       navigatorKey.currentState?.push(
         MaterialPageRoute(
           builder: (_) => const ResearchScreen(),
+        ),
+      );
+    }
+
+    if (type == "Timetable") {
+      navigatorKey.currentState?.push(
+        MaterialPageRoute(
+          builder: (_) => const TimetableScreen(),
         ),
       );
     }

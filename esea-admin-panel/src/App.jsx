@@ -19,6 +19,10 @@ import CreateCourseInfo from "./pages/CreateCourseInfo";
 import EditCourseInfo from "./pages/EditCourseInfo";
 import UploadEseaIdCsv from "./pages/UploadEseaIdCsv";
 import DeleteContent from "./pages/DeleteContent";
+import FeedbackList from "./pages/FeedbackList";
+import InternshipModeration from "./pages/InternshipModeration";
+import AlumniManagement from "./pages/AlumniManagement";
+import DiscussionModeration from "./pages/DiscussionModeration";
 
 
 function App() {
@@ -49,6 +53,10 @@ function App() {
             <Route path="/course-info/create" element={<CreateCourseInfo />} />
             <Route path="/course-info/edit/:id" element={<EditCourseInfo />} />
             <Route path="/esea-id/upload" element = {<UploadEseaIdCsv />} />
+            <Route path="/alumni" element={<AlumniManagement />} />
+            <Route path="/discussions/moderation" element={<DiscussionModeration />} />
+            <Route path="/internships/moderation" element={<InternshipModeration />} />
+            <Route path="/feedback" element={<FeedbackList />} />
             <Route path="/audit" element={<AuditLogs />} />
           </Route>
           </Route>

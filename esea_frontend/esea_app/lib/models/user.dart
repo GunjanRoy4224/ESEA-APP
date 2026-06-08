@@ -22,6 +22,11 @@ class User {
   final String? role;   // student / alumni
   final String? status; // pending / verified
 
+  // ================= ACADEMIC PROFILE =================
+  final String? program; // B.Tech, M.Tech, PhD, Dual Degree
+  final String? minor;
+  final String? researchProject;
+
   User({
     required this.id,
     required this.name,
@@ -34,6 +39,9 @@ class User {
     this.photoUrl,
     this.role,
     this.status,
+    this.program,
+    this.minor,
+    this.researchProject,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -58,6 +66,10 @@ class User {
       role: json['role']?.toString().toLowerCase(),
 
       status: json['status'],
+      
+      program: json['program'],
+      minor: json['minor'],
+      researchProject: json['research_project'],
     );
   }
 
@@ -74,6 +86,9 @@ class User {
       'photo_url': photoUrl,
       'role': role,
       'status': status,
+      'program': program,
+      'minor': minor,
+      'research_project': researchProject,
     };
   }
 

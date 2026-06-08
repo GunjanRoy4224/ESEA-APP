@@ -12,12 +12,15 @@ def create_content_notifications(db, content):
     """
 
     # ---------------- Immediate Notification ----------------
+    # Internships go to 'students', others go to 'all_users'
+    target_topic = "students" if content.type == "internship" else "all_users"
+
     immediate_task = NotificationTask(
         content_id=content.id,
         content_type=content.type,
         title=content.title,
         send_at=datetime.utcnow(),
-        topic="all_users"
+        topic=target_topic
     )
 
     db.add(immediate_task)
@@ -53,7 +56,7 @@ def create_content_notifications(db, content):
             content_type="internship",
             title=content.title,
             send_at=reminder_time,
-            topic="all_users"
+            topic="students"
         )
 
         db.add(internship_task)

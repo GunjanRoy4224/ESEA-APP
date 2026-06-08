@@ -6,6 +6,8 @@ import '../../widgets/student_weekly_timetable_grid.dart';
 import '../../widgets/course_selector_sheet.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../widgets/error_state_widget.dart';
+import 'package:shimmer/shimmer.dart';
 
 class StudentTimetableWidget extends StatefulWidget {
   const StudentTimetableWidget({super.key});
@@ -15,7 +17,9 @@ class StudentTimetableWidget extends StatefulWidget {
       _StudentTimetableWidgetState();
 }
 
-class _StudentTimetableWidgetState extends State<StudentTimetableWidget> {
+class _StudentTimetableWidgetState extends State<StudentTimetableWidget> with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
   bool loading = true;
   String? error;
 
@@ -68,6 +72,7 @@ class _StudentTimetableWidgetState extends State<StudentTimetableWidget> {
 
   @override
 Widget build(BuildContext context) {
+  super.build(context);
   final user = context.watch<AuthProvider>().user;
 
   // 🚫 BLOCK ALUMNI HERE (MAIN FIX)
@@ -90,7 +95,23 @@ Widget build(BuildContext context) {
   // ================= NORMAL STUDENT FLOW =================
 
   if (loading) {
-    return const Center(child: CircularProgressIndicator());
+    return Shimmer.fromColors(
+      baseColor: Colors.grey.shade300,
+      highlightColor: Colors.grey.shade100,
+      child: Column(
+        children: List.generate(
+          4,
+          (index) => Container(
+            margin: const EdgeInsets.only(bottom: 16),
+            height: 100,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   return Column(
@@ -118,9 +139,15 @@ Widget build(BuildContext context) {
       const SizedBox(height: 12),
 
       if (error != null)
-        const Text(
-          "Failed to load timetable",
-          style: TextStyle(color: Colors.red),
+        Expanded(
+          child: ErrorStateWidget(
+            title: "Failed to load timetable",
+            message: "Tap below to retry.",
+            onRetry: () {
+              setState(() => loading = true);
+              _load();
+            },
+          ),
         )
       else if (entries.isEmpty)
         const Padding(
@@ -129,9 +156,13 @@ Widget build(BuildContext context) {
         )
       else
         Expanded(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: StudentWeeklyTimetableGrid(entries: entries),
+          child: RefreshIndicator(
+            onRefresh: _load,
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.only(bottom: 12),
+              child: StudentWeeklyTimetableGrid(entries: entries),
+            ),
           ),
         ),
     ],

@@ -27,6 +27,15 @@ class Settings(BaseSettings):
     # Firebase
     FIREBASE_CREDENTIALS: Optional[str] = None
 
+    # Supabase Storage
+    SUPABASE_URL: Optional[str] = None
+    SUPABASE_SERVICE_KEY: Optional[str] = None
+    SUPABASE_BUCKET: str = "media"
+
+    # Sentry Observability
+    SENTRY_DSN: Optional[str] = None
+    ENVIRONMENT: str = "development"
+
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"

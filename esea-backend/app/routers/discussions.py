@@ -26,8 +26,7 @@ from app.dependencies import get_current_user
 
 router = APIRouter(prefix="/discussions", tags=["Discussions"])
 
-UPLOAD_DIR = "uploads/discussions"
-os.makedirs(UPLOAD_DIR, exist_ok=True)
+# UPLOAD_DIR removed as we use Supabase Storage
 
 
 # ==========================================================
@@ -50,21 +49,8 @@ async def create_discussion(
     image_url = None
 
     if image and image.filename:
-        ext = image.filename.split(".")[-1]
-
-        # SAFE FILE TYPE CHECK (no feature removed)
-        allowed = ["jpg", "jpeg", "png", "webp"]
-        if ext.lower() not in allowed:
-            raise HTTPException(400, "Invalid image type")
-
-        filename = f"{uuid4()}.{ext}"
-        file_path = os.path.join(UPLOAD_DIR, filename)
-
-        with open(file_path, "wb") as buffer:
-            shutil.copyfileobj(image.file, buffer)
-
-        # FIXED PATH (important bug fix)
-        image_url = f"/uploads/discussions/{filename}"
+        from app.services.storage_service import storage_service
+        image_url = storage_service.upload_image(image, "discussions")
 
     poll_data = None
 
@@ -208,6 +194,55 @@ def get_discussions(
 
     return result
 
+
+# ==========================================================
+# GET SINGLE DISCUSSION BY ID
+# ==========================================================
+@router.get("/{discussion_id}")
+def get_discussion_by_id(
+    discussion_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    from sqlalchemy.orm import joinedload
+    
+    d = db.query(Discussion).options(joinedload(Discussion.author)).filter(Discussion.id == discussion_id).first()
+    if not d:
+        raise HTTPException(status_code=404, detail="Discussion not found")
+
+    vote = db.query(DiscussionVote).filter_by(user_id=current_user.id, discussion_id=discussion_id).first()
+    voted = vote is not None
+
+    poll_vote = db.query(DiscussionPollVote).filter_by(user_id=current_user.id, discussion_id=discussion_id).first()
+    user_poll_vote = poll_vote.option_indexes if poll_vote else None
+
+    poll_data = d.poll_data
+    if poll_data and not user_poll_vote:
+        try:
+            hidden_poll = copy.deepcopy(poll_data)
+            options = hidden_poll.get("options", []) if isinstance(hidden_poll, dict) else hidden_poll
+            for opt in options:
+                if isinstance(opt, dict):
+                    opt["votes"] = 0
+                    opt.pop("is_correct", None)
+            poll_data = hidden_poll
+        except Exception as e:
+            print("Poll parsing error:", e)
+
+    return {
+        "id": d.id,
+        "title": d.title,
+        "content": d.content,
+        "author_name": d.author.name,
+        "is_esea_member": d.author.esea_id is not None,
+        "upvotes_count": d.upvotes_count,
+        "comments_count": d.comments_count,
+        "created_at": d.created_at,
+        "voted": voted,
+        "image_url": d.image_url,
+        "poll_data": poll_data,
+        "poll_user_voted": user_poll_vote,
+    }
 
 # ==========================================================
 # POLL VOTE (FIXED SAFE QUERY)

@@ -34,6 +34,9 @@ class User(Base):
     # -------------------------------------------------
     join_year = Column(Integer, nullable=True)
     graduation_year = Column(Integer, nullable=True)
+    program = Column(String(50), nullable=True) # B.Tech, M.Tech, PhD, Dual Degree
+    minor = Column(String(100), nullable=True)
+    research_project = Column(String(255), nullable=True)
 
     # -------------------------------------------------
     # Auth

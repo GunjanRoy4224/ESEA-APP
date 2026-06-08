@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'dart:ui';
 import '../../providers/auth_provider.dart';
+import '../../models/user.dart';
 
 class DigitalIdScreen extends StatelessWidget {
   const DigitalIdScreen({super.key});
@@ -8,267 +10,265 @@ class DigitalIdScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = context.watch<AuthProvider>().user!;
-    final isAlumni = user.isAlumni;
-
-    final gradientColors = isAlumni
-        ? [const Color.fromARGB(255, 118, 182, 255), const Color.fromARGB(255, 159, 181, 243)] // 🔵 alumni blue
-        : [const Color(0xFF3ED598), const Color(0xFF0B6E4F)]; // 🟢 student green
 
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: const Color(0xFFF0F2F5),
       appBar: AppBar(
-        title: const Text("Digital ID"),
+        title: const Text("Identity Card"),
         backgroundColor: Colors.transparent,
-        elevation: 0,
         foregroundColor: Colors.black,
+        elevation: 0,
       ),
-      body: Center(
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+            child: TweenAnimationBuilder<double>(
+              tween: Tween(begin: 0.9, end: 1.0),
+              duration: const Duration(milliseconds: 600),
+              curve: Curves.easeOutCubic,
+              builder: (context, scale, child) {
+                return Transform.scale(
+                  scale: scale,
+                  child: EseaIdCard(user: user),
+                );
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class EseaIdCard extends StatelessWidget {
+  final User user;
+
+  const EseaIdCard({super.key, required this.user});
+
+  bool get isAlumni => user.isAlumni;
+
+  @override
+  Widget build(BuildContext context) {
+    // Apple wallet inspired gradients
+    final primaryColor = isAlumni ? const Color(0xFF1E3A8A) : const Color(0xFF064E3B);
+    final secondaryColor = isAlumni ? const Color(0xFF3B82F6) : const Color(0xFF10B981);
+
+    return Container(
+      constraints: const BoxConstraints(maxWidth: 400),
+      child: AspectRatio(
+        aspectRatio: 0.62,
         child: Container(
-  margin: const EdgeInsets.all(20),
-  padding: const EdgeInsets.all(22),
-  decoration: BoxDecoration(
-    borderRadius: BorderRadius.circular(28),
-
-    // 🎯 EXACT SOFT GRADIENT (MATCHED TO IMAGE)
-    gradient: LinearGradient(
-      colors: isAlumni
-          ? [
-              Color(0xFF9EC5FF), // soft top glow blue
-              Color(0xFF4F7BFF),
-              Color(0xFF2A4FD7),
-              Color(0xFF1E2F8F),
-            ]
-          : [
-              Color(0xFFB9FBC0), // soft green top glow
-              Color(0xFF4ADE80),
-              Color(0xFF16A34A),
-              Color(0xFF065F46),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(28),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [primaryColor, secondaryColor],
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: secondaryColor.withOpacity(0.4),
+                blurRadius: 30,
+                offset: const Offset(0, 15),
+              ),
             ],
-      begin: Alignment.topLeft,
-      end: Alignment.bottomRight,
-    ),
-
-    border: Border.all(
-      color: Colors.white.withOpacity(0.25),
-      width: 1.2,
-    ),
-
-    boxShadow: [
-      BoxShadow(
-        color: Colors.black.withOpacity(0.25),
-        blurRadius: 50,
-        offset: Offset(0, 25),
-      ),
-    ],
-  ),
-
-  child: Stack(
-    children: [
-
-      // 🌟 TOP LEFT GLOW (IMPORTANT)
-      Positioned(
-        top: -40,
-        left: -40,
-        child: SizedBox(
-          width: 180,
-          height: 180,
-           
-        ),
-      ),
-
-      // 🌊 WAVE 1 (MAIN LIGHT FLOW)
-      Positioned(
-        bottom: -20,
-        right: -30,
-        child: Transform.rotate(
-          angle: -0.25,
-          child: Container(
-            width: 260,
-            height: 100,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(80),
-              gradient: LinearGradient(
-                colors: [
-                  const Color.fromARGB(255, 221, 223, 255).withOpacity(0.18),
-                  const Color.fromARGB(255, 255, 227, 227).withOpacity(0.05),
-                  Colors.transparent,
-                ],
-              ),
-            ),
           ),
-        ),
-      ),
-
-      // 🌊 WAVE 2 (SUBTLE SECOND LAYER)
-      Positioned(
-        bottom: 20,
-        right: -10,
-        child: Transform.rotate(
-          angle: -0.2,
-          child: Container(
-            width: 200,
-            height: 60,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(80),
-              gradient: LinearGradient(
-                colors: [
-                  const Color.fromARGB(255, 245, 230, 255).withOpacity(0.1),
-                  Colors.transparent,
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-
-      Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-
-          // ================= HEADER =================
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          child: Stack(
             children: [
-              const Text(
-                "ESEA MEMBER ID",
-                style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 11,
-                  letterSpacing: 1.6,
-                ),
-              ),
-
-              Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 14, vertical: 6),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.18),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  isAlumni ? "ALUMNI" : "STUDENT",
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
+              // Glassmorphism subtle overlay
+              Positioned.fill(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(28),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.05),
+                        border: Border.all(color: Colors.white.withOpacity(0.2), width: 1.5),
+                        borderRadius: BorderRadius.circular(28),
+                      ),
+                    ),
                   ),
                 ),
-              )
-            ],
-          ),
-
-          const SizedBox(height: 8),
-
-          Text(
-            user.memberId,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-              letterSpacing: 2,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-
-          const SizedBox(height: 25),
-
-          // ================= PROFILE =================
-          Row(
-            children: [
-              CircleAvatar(
-                radius: 34,
-                backgroundColor: Colors.white.withOpacity(0.95),
-                child: Text(
-                  user.initials,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+              ),
+              
+              // Decorative shapes
+              Positioned(
+                top: -50,
+                right: -50,
+                child: Container(
+                  width: 200,
+                  height: 200,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white.withOpacity(0.1),
+                  ),
+                ),
+              ),
+              
+              Positioned(
+                bottom: -80,
+                left: -80,
+                child: Container(
+                  width: 250,
+                  height: 250,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.black.withOpacity(0.1),
                   ),
                 ),
               ),
 
-              const SizedBox(width: 16),
-
-              Expanded(
+              // Content Layout
+              Padding(
+                padding: const EdgeInsets.all(24.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      user.fullName,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+                    // Header: Logo & Title
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Image.asset('assets/images/logo.png', height: 28),
+                            ),
+                            const SizedBox(width: 12),
+                            const Text(
+                              "ESEA",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 2,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Text(
+                          isAlumni ? "ALUMNI" : "STUDENT",
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.8),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 1.5,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const Spacer(flex: 2),
+
+                    // Profile Photo
+                    Center(
+                      child: Container(
+                        width: 120,
+                        height: 120,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 4),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.2),
+                              blurRadius: 15,
+                              offset: const Offset(0, 5),
+                            )
+                          ],
+                        ),
+                        child: ClipOval(
+                          child: user.photoUrl != null && user.photoUrl!.isNotEmpty
+                              ? Image.network(user.photoUrl!, fit: BoxFit.cover, errorBuilder: (_, __, ___) => _initialAvatar())
+                              : _initialAvatar(),
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 5),
-                    Text(
-                      isAlumni
-                          ? "Alumni ID: ${user.alumniId ?? "-"}"
-                          : "Roll No: ${user.rollNumber ?? "-"}",
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 13,
+
+                    const SizedBox(height: 20),
+
+                    // Name & Program
+                    Center(
+                      child: Column(
+                        children: [
+                          Text(
+                            user.name,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 26,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 6),
+                          if (user.program != null && user.program!.isNotEmpty)
+                            Text(
+                              "${user.program} • ${isAlumni ? "Class of ${user.graduationYear ?? '-'}" : user.year}",
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.9),
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+
+                    const Spacer(flex: 3),
+
+                    // Info Grid
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              _infoBlock("ESEA ID", user.eseaId),
+                              _infoBlock(isAlumni ? "ALUMNI ID" : "ROLL NUMBER", isAlumni ? (user.alumniId ?? "-") : (user.rollNumber ?? "-"), alignment: CrossAxisAlignment.end),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              _infoBlock("DEPARTMENT", user.department),
+                              _infoBlock("VALID UNTIL", isAlumni ? "Lifetime" : user.validUntil, alignment: CrossAxisAlignment.end),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
-              )
+              ),
             ],
           ),
-
-          const SizedBox(height: 28),
-
-          // ================= DETAILS =================
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _info("Department", user.department),
-
-              if (!isAlumni)
-                _info("Year", user.year),
-            ],
-          ),
-
-          const SizedBox(height: 20),
-
-          // ================= DIVIDER =================
-          Container(
-            height: 1,
-            color: Colors.white.withOpacity(0.35),
-          ),
-
-          const SizedBox(height: 10),
-
-          // ================= FOOTER =================
-          Text(
-            isAlumni
-                ? "GRADUATED IN ${user.graduationYear ?? "N/A"}"
-                : "VALID UNTIL ${user.validUntil}",
-            style: const TextStyle(
-              color: Colors.white70,
-              fontSize: 12,
-              letterSpacing: 1.5,
-            ),
-          ),
-        ],
-      ),
-    ],
-  ),
-)
+        ),
       ),
     );
   }
 
-  Widget _info(String title, String value) {
+  Widget _infoBlock(String label, String value, {CrossAxisAlignment alignment = CrossAxisAlignment.start}) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: alignment,
       children: [
         Text(
-          title.toUpperCase(),
-          style: const TextStyle(
-            color: Colors.white70,
-            fontSize: 11,
+          label,
+          style: TextStyle(
+            color: Colors.white.withOpacity(0.6),
+            fontSize: 10,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 1,
           ),
         ),
         const SizedBox(height: 4),
@@ -276,11 +276,27 @@ class DigitalIdScreen extends StatelessWidget {
           value,
           style: const TextStyle(
             color: Colors.white,
-            fontWeight: FontWeight.bold,
             fontSize: 14,
+            fontWeight: FontWeight.bold,
           ),
         ),
       ],
+    );
+  }
+
+  Widget _initialAvatar() {
+    return Container(
+      color: Colors.white,
+      child: Center(
+        child: Text(
+          user.initials,
+          style: TextStyle(
+            fontSize: 32,
+            fontWeight: FontWeight.bold,
+            color: user.isAlumni ? const Color(0xFF1E3A8A) : const Color(0xFF064E3B),
+          ),
+        ),
+      ),
     );
   }
 }

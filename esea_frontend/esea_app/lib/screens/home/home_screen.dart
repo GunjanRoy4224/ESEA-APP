@@ -5,6 +5,9 @@ import '../../providers/auth_provider.dart';
 import '../../models/content_model.dart';
 import '../../services/content_service.dart';
 import '../../widgets/feature_tile.dart';
+import '../../widgets/error_state_widget.dart';
+import 'package:shimmer/shimmer.dart';
+import '../../widgets/global_search_delegate.dart';
 
 // Screens
 import '../announcements/announcements_screen.dart';
@@ -43,6 +46,16 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     context.read<AuthProvider>().refreshProfile();
     announcementsFuture = ContentService().fetchLatestAnnouncements();
+  }
+
+  Future<void> _refresh() async {
+    context.read<AuthProvider>().refreshProfile();
+    setState(() {
+      announcementsFuture = ContentService().fetchLatestAnnouncements();
+    });
+    try {
+      await announcementsFuture;
+    } catch (_) {}
   }
 
   // ================= NAVIGATION =================
@@ -131,19 +144,35 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
         iconTheme: const IconThemeData(color: Colors.black),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () {
+              showSearch(
+                context: context,
+                delegate: GlobalSearchDelegate(),
+              );
+            },
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
       drawer: _buildDrawer(context),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 120),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _welcomeCard(user),
-            const SizedBox(height: 26),
-            _latestAnnouncements(),
-            const SizedBox(height: 36),
-            _featuresSection(),
-          ],
+      body: RefreshIndicator(
+        onRefresh: _refresh,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 120),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _welcomeCard(user),
+              const SizedBox(height: 26),
+              _latestAnnouncements(),
+              const SizedBox(height: 36),
+              _featuresSection(),
+            ],
+          ),
         ),
       ),
     );
@@ -298,10 +327,35 @@ class _HomeScreenState extends State<HomeScreen> {
             future: announcementsFuture,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
+                return SizedBox(
+                  height: 130,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: 3,
+                    separatorBuilder: (_, __) => const SizedBox(width: 14),
+                    itemBuilder: (_, __) => Shimmer.fromColors(
+                      baseColor: Colors.grey.shade300,
+                      highlightColor: Colors.grey.shade100,
+                      child: Container(
+                        width: 230,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
               }
               if (snapshot.hasError) {
-                return const Text("Error loading announcements");
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  child: ErrorStateWidget(
+                    title: "Couldn't load announcements",
+                    message: "Please check your connection.",
+                    onRetry: _refresh,
+                  ),
+                );
               }
               if (!snapshot.hasData || snapshot.data!.isEmpty) {
                 return const Text(

@@ -14,10 +14,19 @@ def process_notifications(db):
 
     for task in tasks:
         try:
+            # Deep-link payload
+            data_payload = {}
+            if task.content_type and task.content_id:
+                data_payload = {
+                    "type": task.content_type.capitalize(),
+                    "id": task.content_id
+                }
+
             send_topic_notification(
                 title="ESEA Update",
                 body=task.title,
-                topic=task.topic
+                topic=task.topic,
+                data=data_payload
             )
         except Exception as e:
             print(f"Failed to send notification task {task.id}: {e}")

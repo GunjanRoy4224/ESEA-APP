@@ -46,7 +46,10 @@ class _AppShellState extends State<AppShell> {
         // ================= BODY =================
         body: Stack(
           children: [
-            _screens[_currentIndex],
+            IndexedStack(
+              index: _currentIndex,
+              children: _screens,
+            ),
 
             // ================= FLOATING NAV =================
             Positioned(

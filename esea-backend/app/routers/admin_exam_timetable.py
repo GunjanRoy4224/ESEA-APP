@@ -6,6 +6,8 @@ from app.services.audit_service import log_action
 from app.database import get_db
 from app.dependencies import require_admin
 from app.services.exam_timetable_service import replace_exam_timetable
+from datetime import datetime
+from app.models.notification_task import NotificationTask
 
 router = APIRouter(prefix="/admin/exams", tags=["Admin Exam Timetable"])
 
@@ -28,6 +30,16 @@ def upload_exam_timetable(
         replace_exam_timetable(db, title, tmp_path)
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+        
+    # Notify students that a new exam timetable was published
+    task = NotificationTask(
+        content_type="timetable",
+        title=f"New Exam Timetable: {title}",
+        send_at=datetime.utcnow(),
+        topic="students"
+    )
+    db.add(task)
+    db.commit()
     
     log_action(
         db=db,

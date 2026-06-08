@@ -4,6 +4,7 @@ import 'package:shimmer/shimmer.dart';
 import '../../models/content_model.dart';
 import '../../widgets/content_card.dart';
 import 'content_detail_screen.dart';
+import '../../widgets/error_state_widget.dart';
 
 class ContentListScreen extends StatefulWidget {
   final String title;
@@ -28,6 +29,15 @@ class _ContentListScreenState extends State<ContentListScreen> {
     _future = _load();
   }
 
+  Future<void> _refresh() async {
+    setState(() {
+      _future = _load();
+    });
+    try {
+      await _future;
+    } catch (_) {}
+  }
+
   Future<List<ContentModel>> _load() async {
     final data = await widget.loader();
     return data.map((e) => ContentModel.fromJson(e)).toList();
@@ -45,7 +55,11 @@ class _ContentListScreenState extends State<ContentListScreen> {
           }
 
           if (snapshot.hasError) {
-            return const Center(child: Text("Failed to load data"));
+            return ErrorStateWidget(
+              title: "Failed to load ${widget.title.toLowerCase()}",
+              message: "Please check your connection.",
+              onRetry: _refresh,
+            );
           }
 
           final items = snapshot.data ?? [];
@@ -53,25 +67,29 @@ class _ContentListScreenState extends State<ContentListScreen> {
             return const Center(child: Text("No items available"));
           }
 
-          return ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: items.length,
-            itemBuilder: (context, index) {
-              final item = items[index];
+          return RefreshIndicator(
+            onRefresh: _refresh,
+            child: ListView.builder(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.all(16),
+              itemCount: items.length,
+              itemBuilder: (context, index) {
+                final item = items[index];
 
-              return ContentCard(
-                content: item,
-                onTap: () {
-                  // 👇 ALWAYS open detail screen
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => ContentDetailScreen(item: item),
-                    ),
-                  );
-                },
-              );
-            },
+                return ContentCard(
+                  content: item,
+                  onTap: () {
+                    // 👇 ALWAYS open detail screen
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ContentDetailScreen(item: item),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
           );
         },
       ),

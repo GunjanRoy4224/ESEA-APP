@@ -54,6 +54,19 @@ class DiscussionService {
   }
 
   // ==========================================================
+  // FETCH SINGLE DISCUSSION BY ID
+  // ==========================================================
+  Future<DiscussionModel> fetchDiscussionById(int id) async {
+    try {
+      final res = await _client.get("/discussions/$id");
+      return DiscussionModel.fromJson(res.data);
+    } on DioException catch (e) {
+      print("FETCH SINGLE DISCUSSION ERROR: ${e.response?.data}");
+      rethrow;
+    }
+  }
+
+  // ==========================================================
   // CREATE DISCUSSION (Image + Advanced Poll)
   // ==========================================================
   Future<void> createDiscussion(

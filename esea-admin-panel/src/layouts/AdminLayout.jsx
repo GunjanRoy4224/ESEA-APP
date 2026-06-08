@@ -25,6 +25,10 @@ export default function AdminLayout() {
           <NavLink to="/upload/department-courses" style={linkStyle}>Dept Courses</NavLink>
           <NavLink to="/upload/exams" style={linkStyle}>Exam Timetable</NavLink>
           <NavLink to="/course-info" style={linkStyle}>Course Info</NavLink>
+          <NavLink to="/internships/moderation" style={linkStyle}>Internship Queue</NavLink>
+          <NavLink to="/discussions/moderation" style={linkStyle}>Discussions</NavLink>
+          <NavLink to="/alumni" style={linkStyle}>Alumni Verification</NavLink>
+          <NavLink to="/feedback" style={linkStyle}>Feedback</NavLink>
           <NavLink to="/audit" style={linkStyle}>Audit Logs</NavLink>
 
           <button

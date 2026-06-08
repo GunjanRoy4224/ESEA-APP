@@ -9,6 +9,8 @@
 
 import 'package:flutter/material.dart';
 import '../../services/discussion_service.dart';
+import '../../widgets/error_state_widget.dart';
+import 'package:shimmer/shimmer.dart';
 
 // ================= MODEL =================
 class CommentNode {
@@ -41,6 +43,7 @@ class _DiscussionCommentsWidgetState
 
   List<CommentNode> _tree = [];
   bool _loading = true;
+  String? _error;
 
   final TextEditingController _commentController =
       TextEditingController();
@@ -53,7 +56,10 @@ class _DiscussionCommentsWidgetState
   // LOAD COMMENTS
   // ==========================================================
   Future<void> _load() async {
-    setState(() => _loading = true);
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
 
     try {
       final raw =
@@ -85,6 +91,7 @@ class _DiscussionCommentsWidgetState
 
     } catch (e) {
       print("COMMENT LOAD ERROR: $e");
+      setState(() => _error = e.toString());
     }
 
     setState(() => _loading = false);
@@ -137,7 +144,31 @@ class _DiscussionCommentsWidgetState
   Widget build(BuildContext context) {
 
     if (_loading) {
-      return const Center(child: CircularProgressIndicator());
+      return Shimmer.fromColors(
+        baseColor: Colors.grey.shade300,
+        highlightColor: Colors.grey.shade100,
+        child: Column(
+          children: List.generate(
+            3,
+            (index) => Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              height: 60,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    if (_error != null) {
+      return ErrorStateWidget(
+        title: "Couldn't load comments",
+        message: "Please check your connection.",
+        onRetry: _load,
+      );
     }
 
     return Column(

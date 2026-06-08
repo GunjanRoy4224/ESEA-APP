@@ -5,6 +5,7 @@ import 'package:app_links/app_links.dart';
 import '../models/user.dart';
 import '../services/auth_service.dart';
 import '../services/storage_service.dart';
+import '../services/notification_service.dart';
 
 class AuthProvider with ChangeNotifier {
   final AuthService _authService = AuthService();
@@ -14,12 +15,14 @@ class AuthProvider with ChangeNotifier {
   User? _user;
   bool _isAuthenticated = false;
   bool _isLoading = false;
+  bool _isInitialized = false;
 
   StreamSubscription<Uri>? _linkSub;
 
   User? get user => _user;
   bool get isAuthenticated => _isAuthenticated;
   bool get isLoading => _isLoading;
+  bool get isInitialized => _isInitialized;
 
   // ============================
   // INIT
@@ -48,6 +51,7 @@ class AuthProvider with ChangeNotifier {
     }
 
     _isLoading = false;
+    _isInitialized = true;
     notifyListeners();
   }
 
@@ -142,6 +146,12 @@ class AuthProvider with ChangeNotifier {
         _isAuthenticated = true;
 
         await _storageService.saveUser(freshUser);
+
+        // Update notification subscriptions
+        await NotificationService().initNotifications(
+          isEseaMember: freshUser.eseaId != null && freshUser.eseaId!.isNotEmpty,
+          isStudent: freshUser.role == 'student' || freshUser.role == 'Student',
+        );
 
         print("✅ User updated from API");
       } else {

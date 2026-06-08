@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../providers/auth_provider.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -105,7 +106,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       backgroundImage:
                           (user.photoUrl != null &&
                                   user.photoUrl!.trim().isNotEmpty)
-                              ? NetworkImage(user.photoUrl!)
+                              ? CachedNetworkImageProvider(user.photoUrl!) as ImageProvider
                               : null,
                       child: (user.photoUrl == null ||
                               user.photoUrl!.trim().isEmpty)

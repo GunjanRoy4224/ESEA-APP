@@ -42,4 +42,7 @@ def read_me(current_user: User = Depends(get_current_user)):
 
         # ================= OPTIONAL =================
         "photo_url": current_user.photo_url,
+        "program": current_user.program,
+        "minor": current_user.minor,
+        "research_project": current_user.research_project,
     }
